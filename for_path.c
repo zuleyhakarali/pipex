@@ -18,15 +18,17 @@ static char *making_str(char *paths, char *command)
 
 static void free_s(char **s)
 {
-    char *s_f_a;
+    int i;
 
-    s_f_a = s;
-    while (*s)
+    i = 0;
+    if (!s)
+        return ;
+    while (s[i])
     {
-        free(*s);
-        s++;
+        free(s[i]);
+        i++;
     }
-    free(s_f_a);
+    free(s);
 }
 
 char *check_path(char *command)
