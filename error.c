@@ -1,6 +1,6 @@
 #include "pipex.h"
 
-void error_message(int i)
+void    error_message(int i)
 {
     if (i == 0)
     {

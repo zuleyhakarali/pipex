@@ -1,16 +1,14 @@
 #include "pipex.h"
 
-// useable functs  open, close, read, write,
-// malloc, free, perror,
-// strerror, access, dup, dup2,
-// execve, exit, fork, pipe,
-// unlink, wait, waitpid
-
-void second_child(int *fd, int write, char **av, char **env)
+static void second_child(int *fd,char **av, char **env)
 {
-    char *path;
-    char **command;
+    char    *path;
+    char    **command;
+    int     write;
 
+    write = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
+    if (write == -1)
+        error_message(2);
     close(fd[1]);
     dup2(fd[0], STDIN_FILENO);
     dup2(write, STDOUT_FILENO);
@@ -19,21 +17,21 @@ void second_child(int *fd, int write, char **av, char **env)
     if (!command || !*command)
         return (free_s(command));
     path = check_path(*command);
-    if (!path)
+    if (!path || !*path)
     {
         free_s(command);
         error_message(3);
     }
     execve(path, command, env);
-    free_s(command);
     free(path);
+    free_s(command);
     error_message(4);
 }
 
-void first_child(int *fd, int read, char **av, char **env)
+static void first_child(int *fd, int read, char **av, char **env)
 {
-    char *path;
-    char **command;
+    char    *path;
+    char    **command;
 
     close(fd[0]);
     dup2(read, STDIN_FILENO);
@@ -43,23 +41,35 @@ void first_child(int *fd, int read, char **av, char **env)
     if (!command || !*command)
         return (free_s(command));
     path = check_path(*command);
-    if (!path)
+    if (!path || !*path)
     {
         free_s(command);
         error_message(3);
     }
     execve(path, command, env);
-    free_s(command);
     free(path);
+    free_s(command);
     error_message(4);
 }
 
-void for_pipe(int *fd, int read, int write, char **av, char **env)
+static void for_pipes_exit(void)
+{
+    int forexit;
+    int status;
+
+    forexit = 0;
+    while (wait(&status) > 0)
+    {
+        if (WIFEXITED(status))
+            forexit = WEXITSTATUS(status);
+    }
+    exit(forexit);   
+}
+
+static void for_pipe(int *fd, int read, char **av, char **env)
 {
     int fir_pid;
     int sec_pid;
-    int status;
-    int forexit;
 
     fir_pid = fork();
     if (fir_pid == -1)
@@ -68,28 +78,20 @@ void for_pipe(int *fd, int read, int write, char **av, char **env)
         first_child(fd, read, av, env);
     else
     {
-        sec_pid = fork();
-        if (sec_pid == -1)
+        if ((sec_pid = fork()) == -1)
             return ;
         else if (sec_pid == 0)
-            second_child(fd, write, av, env);
+            second_child(fd, av, env);
     }
     close(fd[0]);
     close(fd[1]);
-    forexit = 0;
-    while (wait(&status) > 0)
-    {
-        if (WIFEXITED(status))
-            forexit = WEXITSTATUS(status);
-    }
-    exit(forexit);
+    for_pipes_exit();
 }
 
-int  main(int ac, char **av, char **env)
+int main(int ac, char **av, char **env)
 {
     int fd[2];
     int read;
-    int write;
 
     if (ac != 5)
         error_message(0);
@@ -101,9 +103,11 @@ int  main(int ac, char **av, char **env)
         error_message(1);
         read = open("/dev/null", O_RDONLY);
     }
-    write = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
-    if (write == -1)
-        error_message(2);
-    for_pipe(fd, read, write, av, env);
+    if (access(av[4], F_OK) == 0)
+    {
+        if (access(av[4], W_OK) != 0)
+            error_message(2);
+    }
+    for_pipe(fd, read, av, env);
     return (0);
 }

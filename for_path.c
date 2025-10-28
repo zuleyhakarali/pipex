@@ -3,8 +3,8 @@
 
 static char *making_str(char *paths, char *command)
 {
-    char *str;
-    char *str2;
+    char    *str;
+    char    *str2;
 
     str = ft_strjoin(paths, "/");
     if (!str)
@@ -16,7 +16,7 @@ static char *making_str(char *paths, char *command)
     return (str2);
 }
 
-void free_s(char **s)
+void    free_s(char **s)
 {
     int i;
 
@@ -31,12 +31,12 @@ void free_s(char **s)
     free(s);
 }
 
-char *check_path(char *command)
+char    *check_path(char *command)
 {
-    char *path;
-    char **paths;
-    char *true;
-    int i;
+    char    *path;
+    char    **paths;
+    char    *true;
+    int     i;
 
     if (command[0] == '\0')
         return (NULL);
@@ -57,6 +57,5 @@ char *check_path(char *command)
         free(true);
         i++;
     }
-    error_message(3);
-    return (free_s(paths), free(true), NULL);
+    return (free_s(paths), NULL);
 }
