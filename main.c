@@ -16,10 +16,18 @@ void second_child(int *fd, int write, char **av, char **env)
     dup2(write, STDOUT_FILENO);
     close(fd[0]);
     command = ft_split(av[3], ' ');
+    if (!command || !*command)
+        return (free_s(command));
     path = check_path(*command);
     if (!path)
+    {
+        free_s(command);
         error_message(3);
+    }
     execve(path, command, env);
+    free_s(command);
+    free(path);
+    error_message(4);
 }
 
 void first_child(int *fd, int read, char **av, char **env)
@@ -32,16 +40,26 @@ void first_child(int *fd, int read, char **av, char **env)
     dup2(fd[1], STDOUT_FILENO);
     close(fd[1]);
     command = ft_split(av[2], ' ');
+    if (!command || !*command)
+        return (free_s(command));
     path = check_path(*command);
     if (!path)
+    {
+        free_s(command);
         error_message(3);
+    }
     execve(path, command, env);
+    free_s(command);
+    free(path);
+    error_message(4);
 }
 
 void for_pipe(int *fd, int read, int write, char **av, char **env)
 {
     int fir_pid;
     int sec_pid;
+    int status;
+    int forexit;
 
     fir_pid = fork();
     if (fir_pid == -1)
@@ -58,8 +76,13 @@ void for_pipe(int *fd, int read, int write, char **av, char **env)
     }
     close(fd[0]);
     close(fd[1]);
-    waitpid(fir_pid, NULL, 0);
-    waitpid(sec_pid, NULL, 0);
+    forexit = 0;
+    while (wait(&status) > 0)
+    {
+        if (WIFEXITED(status))
+            forexit = WEXITSTATUS(status);
+    }
+    exit(forexit);
 }
 
 int  main(int ac, char **av, char **env)
@@ -74,7 +97,10 @@ int  main(int ac, char **av, char **env)
         return (1);
     read = open(av[1], O_RDONLY);
     if (read == -1)
+    {
         error_message(1);
+        read = open("/dev/null", O_RDONLY);
+    }
     write = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0777);
     if (write == -1)
         error_message(2);

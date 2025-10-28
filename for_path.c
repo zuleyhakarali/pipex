@@ -16,7 +16,7 @@ static char *making_str(char *paths, char *command)
     return (str2);
 }
 
-static void free_s(char **s)
+void free_s(char **s)
 {
     int i;
 
@@ -35,27 +35,28 @@ char *check_path(char *command)
 {
     char *path;
     char **paths;
-    char **paths_first_adress;
     char *true;
     int i;
 
+    if (command[0] == '\0')
+        return (NULL);
     path = getenv("PATH");
     if (!path)
         return (NULL);
     paths = ft_split(path, ':');
     if (!paths)
         return (NULL);
-    paths_first_adress = paths;
     i = 0;
     while (paths[i])
     {
         true = making_str(paths[i], command);
         if (!true)
-            return (free_s(paths_first_adress), NULL);
+            return (free_s(paths), free(true), NULL);
         if (access(true, X_OK) == 0)
-            return (free_s(paths_first_adress), true);
+            return (free_s(paths), true);
         free(true);
         i++;
     }
-    return (free_s(paths_first_adress), NULL);
+    error_message(3);
+    return (free_s(paths), free(true), NULL);
 }

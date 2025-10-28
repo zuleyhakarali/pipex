@@ -10,6 +10,7 @@
 
 int main(int ac, char **av, char **env);
 char *check_path(char *command);
+void free_s(char **s);
 void error_message(int i);
 
 # endif

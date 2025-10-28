@@ -4,22 +4,24 @@ void error_message(int i)
 {
     if (i == 0)
     {
-        perror("An incorrect number of arguments were entered\n");
+        perror("incorrect number of arguments");
         exit(1);
     }
     else if (i == 1)
-    {
-        perror("Input file is not valid\n");
-        exit(1);
-    }
+        perror("input file");
     else if (i == 2)
     {
-        perror("Cannot create the output file\n");
+        perror("output file");
         exit(1);
     }
     else if (i == 3)
     {
-        perror("Command not found\n");
-        exit(127); //neden 127
+        perror("command not found");
+        exit(127);
+    }
+    else if (i == 4)
+    {
+        perror("execve failed");
+        exit(1);
     }
 }
