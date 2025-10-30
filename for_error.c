@@ -6,7 +6,7 @@
 /*   By: zkarali <zkarali@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 13:24:08 by zkarali           #+#    #+#             */
-/*   Updated: 2025/10/30 13:24:09 by zkarali          ###   ########.fr       */
+/*   Updated: 2025/10/30 15:12:25 by zkarali          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	error_message(int i)
 {
 	if (i == 0)
 	{
-		perror("incorrect number of arguments");
+		write(2, "Error: incorrect number of arguments\n", 37);
 		exit(1);
 	}
 	else if (i == 1)
