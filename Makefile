@@ -2,7 +2,7 @@ NAME = pipex
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
-SRC = main.c error.c for_path.c
+SRC = main.c for_error.c for_path.c
 
 OBJS = $(SRC:.c=.o)
 

@@ -2,11 +2,11 @@
 # define PIPEX_H
 
 # include "libft/libft.h"
-# include <unistd.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <fcntl.h>
-# include <sys/wait.h>
+# include <unistd.h> //access, execve, pipe, dup2, fork, close, read, write
+# include <stdio.h>  //perror
+# include <stdlib.h> //malloc, free, exit, NULL
+# include <fcntl.h>  //open()
+# include <sys/wait.h> //wait(), waitpid()
 
 int		main(int ac, char **av, char **env);
 char	*check_path(char *command);
